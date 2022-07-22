@@ -13,8 +13,8 @@ from groups.serializers import GroupSerializer
 
 
 async def get_groups(request, pk):
-    if pk in cache:
-        group = cache.get(pk)
+    group = cache.get(pk)
+    if group is not None:
         return JsonResponse(group)
     else:
         try:
