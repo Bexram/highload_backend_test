@@ -2,9 +2,7 @@ from asgiref.sync import sync_to_async
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from django.http import JsonResponse
 
 from config import settings
 from services.vk import get_data_from_vk
@@ -14,20 +12,20 @@ from groups.models import Group
 from groups.serializers import GroupSerializer
 
 
-@sync_to_async
-@api_view(["GET"])
-def get_groups(request, pk):
+async def get_groups(request, pk):
     if pk in cache:
-        products = cache.get(pk)
-        return Response(products, status=status.HTTP_200_OK)
+        group = cache.get(pk)
+        return JsonResponse(group)
     else:
         try:
-            queryset = Group.objects.get(id=pk)
+            queryset = await _get_queryset(pk)
         except ObjectDoesNotExist:
-            queryset = get_data_from_vk(pk)
+            queryset = await get_data_from_vk(pk)
         serializer = GroupSerializer(queryset)
         cache.set(queryset.id, serializer.data, timeout=CACHE_TTL)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.data)
 
 
-# TODO: переодическая актуализация данных с ВК
+@sync_to_async
+def _get_queryset(pk):
+    return Group.objects.get(id=pk)

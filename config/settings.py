@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-le&)5d80w_sbslet9c^b6r)9h2*(%xgga6c@v4*-*k39l17un8
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+REDIS_HOST='cache'
 # Application definition
 
 INSTALLED_APPS = [
@@ -87,7 +87,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -131,9 +130,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://cache:6379/',
+        'LOCATION': f'redis://{REDIS_HOST}:6379/',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
