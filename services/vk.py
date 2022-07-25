@@ -1,7 +1,7 @@
 import json
 
 import requests
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async
 
 from groups.models import Group
 
@@ -15,7 +15,7 @@ def get_data_from_vk(id, action='create'):
     )
     group = json.loads(response.text)
     if action == 'create':
-        async_to_sync(_create_new_group)(group)  # что б не ждать записи в базу после получения с ВК
+        _create_new_group(group)
         new_group = {
             'id': group['response'][0]['id'],
             'title': group['response'][0]['name'],

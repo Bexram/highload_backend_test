@@ -22,7 +22,7 @@ async def get_groups(request, pk):
         except ObjectDoesNotExist:
             queryset = await get_data_from_vk(pk)
         serializer = GroupSerializer(queryset)
-        cache.set(queryset.id, serializer.data, timeout=CACHE_TTL)
+        cache.set(serializer.data['id'], serializer.data, timeout=CACHE_TTL)
         return JsonResponse(serializer.data)
 
 
