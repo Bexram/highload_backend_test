@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import asyncio
 import os
 
 from celery import Celery
@@ -16,9 +17,13 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 @app.task
-def update_db():
+async def update_db():
     from groups.models import Group
     from services.vk import get_data_from_vk
-
+    queue = asyncio.Queue()
+    task_list = []
     for group in Group.objects.all():
-        get_data_from_vk(group.id, 'update')
+        task = asyncio.create_task(get_data_from_vk(group.id, 'update'))
+        task_list.append(task)
+    await queue.join()
+    await asyncio.gather(*task_list, return_exceptions=True)

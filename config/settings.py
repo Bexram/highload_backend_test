@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-le&)5d80w_sbslet9c^b6r)9h2*(%xgga6c@v4*-*k39l17un8'
-
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -140,3 +140,5 @@ CACHES = {
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+
