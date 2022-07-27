@@ -18,12 +18,14 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task
 async def update_db():
-    from groups.models import Group
     from services.vk import get_data_from_vk
+    from groups.views import _get_groups_ids
+    groups = await _get_groups_ids()
     queue = asyncio.Queue()
     task_list = []
-    for group in Group.objects.all():
-        task = asyncio.create_task(get_data_from_vk(group.id, 'update'))
+    for group in groups:
+        task = asyncio.create_task(get_data_from_vk(group, 'update'))
         task_list.append(task)
     await queue.join()
+    await asyncio.gather(*task_list, return_exceptions=True)
     await asyncio.gather(*task_list, return_exceptions=True)

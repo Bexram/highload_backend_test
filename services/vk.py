@@ -1,18 +1,18 @@
 import json
 
-import httpx
+import aiohttp as aiohttp
 
 key = ''
 
 async def get_data_from_vk(id, action='create'):
     from groups.views import _create_new_group, _get_queryset
     group = {}
-    async with httpx.AsyncClient() as client:
+    async with aiohttp.ClientSession() as client:
         r = await client.get(
             f'https://api.vk.com/method/groups.getById?group_id={id}&access_token={key}&v=5.81&fields=name&fields=members_count'
         )
-        print(f'get {id} {r}')
-        group = json.loads(r.text)
+        print(f'get {id} {r.status}')
+        group = json.loads(await r.text())
     if action == 'create':
         await _create_new_group(group)
         new_group = {
